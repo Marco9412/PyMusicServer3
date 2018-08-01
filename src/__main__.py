@@ -4,6 +4,7 @@
 #
 
 import logging
+import globals
 
 from time import sleep
 
@@ -17,14 +18,12 @@ from frontend.httpsfrontend.httpshandler import createHTTPSServer
 from parameters.parameterparser import parse_arguments
 from music.download.youtubedlupdater import YoutubeDlUpdater
 
-REVISION = 'r0.1.16 beta'
-DATE = '2017/07/18'
 
 
 def main():
     parse_arguments()
 
-    logging.info('PyMusicServer3 %s Marco Panato - %s' % (REVISION, DATE))
+    logging.info('PyMusicServer3 %s Marco Panato - %s' % (globals.REVISION, globals.DATE))
 
     logging.info('[MAIN] Loading settings')
     SettingsProvider.get_instance()

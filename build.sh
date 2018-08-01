@@ -2,6 +2,8 @@
 
 EXECUTABLENAME="PyMusicServer3"
 
+mkdir -p out
+
 echo "Cleaning old files"
 rm -f "out/$EXECUTABLENAME" "out/$EXECUTABLENAME.zip"
 

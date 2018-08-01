@@ -1,5 +1,6 @@
 import argparse
 import logging
+import globals
 
 from settings.settingsprovider import new_settings_file
 from utils.logging_utils import init_logging
@@ -14,8 +15,13 @@ def parse_arguments():
     # parser.add_argument('-r', '--redirect', type=str, metavar='F', help='redirect output to F')
     parser.add_argument('-l', '--log_level', type=str, default='info', choices=['info', 'debug', 'warning'],
                         help='The level of logging required, default info')
+    parser.add_argument('-v', '--version', action='store_true', help='show version')
 
     params = parser.parse_args()
+
+    if params.version:
+        print('Version: {}, Build date: {}'.format(globals.REVISION, globals.DATE))
+        exit(0)
 
     init_logging(params.log_level)
 
