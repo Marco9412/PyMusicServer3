@@ -9,6 +9,7 @@ import time
 import logging
 import uuid
 import os
+import sys
 
 
 class PyYoutubeDownloader(object):
@@ -39,23 +40,24 @@ class PyYoutubeDownloader(object):
 
                 outputfolder = FolderManager().getFolderPath()
 
-                tmpUuid = uuid.uuid4()
-                tmpsong = '{}/{}.mp3'.format(outputfolder, str(tmpUuid))
+                tmpuuid = uuid.uuid4()
+                tmpsong = '{}/{}'.format(outputfolder, str(tmpuuid))
 
                 # Defaults options
                 ydloptions = dict(format='bestaudio/best', postprocessors=[
                     dict(key='FFmpegExtractAudio', preferredcodec='mp3', preferredquality='320')
                     # ], outtmpl=outputfolder + '/%(title)s.%(ext)s')
-                ], outtmpl=tmpsong)  # using tmp file
+                ], outtmpl=tmpsong + '.%(ext)s')
 
                 logging.debug('[DOWNLOADER] Downloading temporary file %s' % tmpsong)
 
                 # Get media info
-                videoname = fixVideoName(youtube_dl.YoutubeDL(ydloptions).extract_info(self.url).get('title'))
+                videoinfo = youtube_dl.YoutubeDL(ydloptions).extract_info(self.url)
+                videoname = fixVideoName(videoinfo.get('title'))
                 logging.debug('[DOWNLOADER] Video name is %s' % videoname)
                 if videoname is not None:
                     newsong = outputfolder + '/' + videoname + '.mp3'
-
+                    tmpsong = tmpsong + '.mp3'
                     logging.debug('[DOWNLOADER] Renaming {} to {}'.format(tmpsong, newsong))
                     os.rename(tmpsong, newsong)  # renaming to correct name
                     if not setTagsYt(newsong, videoname):
@@ -68,9 +70,11 @@ class PyYoutubeDownloader(object):
 
                 downloadMutex.release()
                 return
-            except:  # import sys  #print("Unexpected error:", sys.exc_info()[0])
+            except ImportError:
                 downloadMutex.release()
-
-                logging.debug(
-                    '[DOWNLOADER] Youtube-dl module is updating or download error... retrying in 10 seconds...')
+                logging.debug('[DOWNLOADER] Youtube-dl module is updating... retrying in 10 seconds...')
                 time.sleep(10)
+            except:
+                downloadMutex.release()
+                print('[DOWNLOADER] Download error {}'.format(str(sys.exc_info())))
+                return

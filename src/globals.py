@@ -1,3 +1,3 @@
 
-REVISION = 'r0.1.17 beta'
-DATE = '2018/08/01'
+REVISION = 'r0.1.18 beta'
+DATE = '2018/08/02'

@@ -19,7 +19,6 @@ from parameters.parameterparser import parse_arguments
 from music.download.youtubedlupdater import YoutubeDlUpdater
 
 
-
 def main():
     parse_arguments()
 
