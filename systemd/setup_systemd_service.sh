@@ -2,6 +2,8 @@
 
 cd ..
 
+./build.sh
+
 # Generate service description
 
 echo -e "[Unit]
@@ -13,7 +15,7 @@ User=$(whoami)
 Group=$(whoami)
 WorkingDirectory=$(pwd)
 Environment=\"PATH=/usr/bin\"
-ExecStart=$(pwd)/out/PyMusicServer3 -s $(pwd)/resources/settings_my.json -l debug
+ExecStart=$(pwd)/out/PyMusicServer3 -s $(pwd)/resources/settings.cfg -l debug
 
 [Install]
 WantedBy=multi-user.target
