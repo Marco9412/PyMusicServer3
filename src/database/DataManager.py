@@ -43,7 +43,6 @@ class DataManager(object):
 
     def _initData(self):
         logging.debug('[DATAMANAGER] Loading data from db...')
-        self._users = self._db.getusers()  # Users
         self._ytids = self._db.listYtUris()  # Yt videos
         self._songsById = self._db.listsongs()  # Songs by id
         self._foldersById = self._db.listfolders()  # Folders by id
@@ -221,12 +220,12 @@ class DataManager(object):
     def getFolderIdFromPublicUrl(self, publicUrl):
         if publicUrl in self._foldersIdByPublicUrls:
             return self._foldersIdByPublicUrls[publicUrl]
-        return 0 # TODO correct?
+        return 0  # TODO correct?
 
     def getPublicUrl(self, folderid):
         if folderid in self._foldersById:
             return self._foldersById.get(folderid).getPublicUrl()
-        return "" # TODO correct?
+        return ""  # TODO correct?
 
     def getplaylist(self, name):
         return self._playlistsByName.get(name)
@@ -300,12 +299,10 @@ class DataManager(object):
 
     def getSongSize(self, songid):
         path = self.getsongpath(songid)
-        if path: return getsize(path)
-        else: return -1
+        return getsize(path) if path else -1
 
     def addRemoteSong(self, name, data):
-        if not isinstance(data, xmlrpc.client.Binary) and \
-                not isinstance(data, bytes):
+        if not isinstance(data, xmlrpc.client.Binary) and not isinstance(data, bytes):
             logging.debug('[DATAMANAGER] Wrong argument for addRemoteSong %s' % type(data).__name__)
             return False
 
@@ -323,35 +320,3 @@ class DataManager(object):
             fd.write(data)
         self.addSongFromPath(songpath)
         return True
-
-    # -----------------------------------------------------------------------------
-    #   Users data
-    # -----------------------------------------------------------------------------
-    def addUser(self, username, password, role):
-        self._db.addnewuser(username, password, role)
-
-    def getUsers(self):
-        return self._users
-        # -----------------------------------------------------------------------------
-
-        # def getfolderpath(self, folderid):
-        #     """
-        #     Returns the path of this folder
-        #     """
-        #     path = ''
-        #
-        #     fol_id = folderid
-        #     while True:
-        #         current = self.getfolder(fol_id)
-        #         if not current:
-        #             if fol_id == folderid:
-        #                 logging.debug('Folder not found')
-        #             else:
-        #                 logging.debug('Data inconsistent!!!')
-        #             return None
-        #         path = current.name + '/' + path
-        #         fol_id = current.parentId
-        #         if current.isroot:
-        #             break
-        #
-        #     return removeLastSlash(removeDoubleSlash(path))

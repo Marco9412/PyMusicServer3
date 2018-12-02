@@ -25,7 +25,7 @@ class PyMusicManager(object):
     def __init__(self):
         self._dm = DataManager.get_instance()
 
-    def _getsongpath(self, songid):
+    def getsongpath(self, songid):
         return self._dm.getsongpath(songid)
 
     def getsong(self, songid):
@@ -93,11 +93,11 @@ class PyMusicManager(object):
 
     def readsong(self, songid):
         """ Returns an array containing the song identified by 'songid'
-			and its name
-			(data, songname)
-		"""
+            and its name
+            (data, songname)
+        """
         data = None
-        path = self._getsongpath(songid)
+        path = self.getsongpath(songid)
         song = self.getsong(songid)
         if path is not None:
             with open(path, 'rb') as f:
@@ -121,15 +121,21 @@ class PyMusicManager(object):
             song = self._dm.getsong(songid)
             if song:
                 res += '#EXTINF:%d, %s - %s\n' % (song.oid, song.artist, song.title)
-            res += 'http://%s:%s/getsong?id=%d\n' % (myremoteip, SettingsProvider.get_instance().readsetting('listenporthttp'), songid)
+            res += 'http://%s:%s/%sgetsong?id=%d\n' % (myremoteip,
+                                                       SettingsProvider.get_instance().read_setting('listenporthttp'),
+                                                       SettingsProvider.get_instance().read_setting('redirectbasepath'),
+                                                       songid)
         return res
 
-    def getm3ufromfolder(self, folderid, myremoteip, recursive = False, header = True):
+    def getm3ufromfolder(self, folderid, myremoteip, recursive=False, header=True):
         res = '#EXTM3U\n' if header else ''
         songs = self._dm.listsongsinto(folderid)
         for song in songs:
             res += '#EXTINF:%d, %s - %s\n' % (song.oid, song.artist, song.title)
-            res += 'http://%s:%s/getsong?id=%d\n' % (myremoteip, SettingsProvider.get_instance().readsetting('listenporthttp'), song.oid)
+            res += 'http://%s:%s/%sgetsong?id=%d\n' % (myremoteip,
+                                                       SettingsProvider.get_instance().read_setting('listenporthttp'),
+                                                       SettingsProvider.get_instance().read_setting('redirectbasepath'),
+                                                       song.oid)
 
         if recursive:
             folders = self._dm.listfoldersinto(folderid)
@@ -138,7 +144,7 @@ class PyMusicManager(object):
 
         return res
 
-    def updateDb(self): # TODO role?
+    def updateDb(self):  # TODO role?
         self._dm.updateData()
 
     def getsongsize(self, songid):

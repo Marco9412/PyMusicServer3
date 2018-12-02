@@ -2,6 +2,9 @@
 # Html utils
 #
 
+from settings.settingsprovider import SettingsProvider
+
+
 def writehtmlheader():
     return "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1" \
            "-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">"
@@ -52,9 +55,9 @@ def writesearchform():
            '<input type="text" name="query"/><input type="submit" value="Search"/>' \
            '</fieldset>' \
            '</form>'
-           #u'<input type="radio" name="what" value="song" checked> Song<br>' \
-           #u'<input type="radio" name="what" value="folder"> Folder<br>' \
-           #u'<input type="radio" name="what" value="playlist"> Playlist<br>' \
+    # u'<input type="radio" name="what" value="song" checked> Song<br>' \
+    # u'<input type="radio" name="what" value="folder"> Folder<br>' \
+    # u'<input type="radio" name="what" value="playlist"> Playlist<br>' \
 
 
 def writedownloadform():
@@ -68,29 +71,30 @@ def writedownloadform():
                                   '</form>'
 
 
-def writehostnamefolderfunction(id, rec = False):
+def writehostnamefolderfunction(idd, rec=False):
     # window.location.href = '...';
     return '<script>' \
            'function getFol%s() {' \
-           '  window.location.href="/m3u?type=folder&id=%d%s&ip=" + window.location.hostname' \
+           '  window.location.href="/%sm3u?type=folder&id=%d%s&ip=" + window.location.hostname' \
            '}' \
-           '</script>' % ('R' if rec else '' ,id, '&rec=y' if rec else '')
+           '</script>' % ('R' if rec else '', SettingsProvider.get_instance().read_setting('redirectbasepath'),
+                          idd, '&rec=y' if rec else '')
 
 
 def writePublicUrlFunction(url):
     return '<script>' \
            'function moveToPublic() {' \
-           '    window.location.href = \'http://\' + window.location.hostname + \':9998/public/%s\'' \
+           '    window.location.href = \'http://\' + window.location.hostname + \'/%spublic/%s\'' \
            '}' \
-           '</script>' % url
+           '</script>' % (SettingsProvider.get_instance().read_setting('redirectbasepath'), url)
 
 
 def writehostnameplaylistfunction(name):
     return '<script>' \
            'function getPl() {' \
-           '  window.location.href="/m3u?type=playlist&name=%s"' \
+           '  window.location.href="/%sm3u?type=playlist&name=%s"' \
            '}' \
-           '</script>' % (name)
+           '</script>' % (SettingsProvider.get_instance().read_setting('redirectbasepath'), name)
 
 
 def writeUploadForm():

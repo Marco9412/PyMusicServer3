@@ -22,31 +22,37 @@ class SongSender(BaseHTTPRequestHandler):
         self.send_response(404)
         self.end_headers()
 
-    def handle_get_playlist(self, requestType):
-        params = getQueryStringMap(self.path) if requestType == 'GET' else self.getpostvariables()
+    def handle_get_playlist(self, request_type):
+        params = getQueryStringMap(self.path) if request_type == 'GET' else self.getpostvariables()
 
         if params is None:
             self.handleerror()
             return
 
         ip = params.get('ip')
-        if ip: ip = ip[0]
+        if ip:
+            ip = ip[0]
 
-        type = params.get('type')
-        if type: type = type[0]
+        req_type = params.get('type')
+        if req_type:
+            req_type = req_type[0]
 
-        if type == 'folder':
-            id = params.get('id')
-            if id: id = int(id[0])
+        if req_type == 'folder':
+            fol_id = params.get('id')
+            if fol_id:
+                fol_id = int(fol_id[0])
 
             rec = params.get('rec')
-            if rec: rec = True
-            else: rec = False
+            if rec:
+                rec = True
+            else:
+                rec = False
 
-            self._sendm3u(PyMusicManager.get_instance().getm3ufromfolder(id, ip, rec), 'plf_%d.m3u' % id)
-        elif type == 'playlist':
+            self._sendm3u(PyMusicManager.get_instance().getm3ufromfolder(fol_id, ip, rec), 'plf_%d.m3u' % fol_id)
+        elif req_type == 'playlist':
             name = params.get('name')
-            if name: name = name[0]
+            if name:
+                name = name[0]
             self._sendm3u(PyMusicManager.get_instance().getm3ufromplaylist(name, ip), 'plp_%s.m3u' % name)
         else:
             self.handleerror()
@@ -57,17 +63,16 @@ class SongSender(BaseHTTPRequestHandler):
 
             # Fix! -> parse_multipart with boundary requires bytes!
             pdict2 = {}
-            for k,v in pdict.items():
+            for k, v in pdict.items():
                 if isinstance(v, str):
                     pdict2[k] = v.encode()
                 else:
                     pdict2[k] = v
 
             environ = {
-                'REQUEST_METHOD' : 'POST',
-                'CONTENT_TYPE' : ctype,
-                'CONTENT_LENGTH' : self.headers.get_all('content-length')[0]
-
+                'REQUEST_METHOD': 'POST',
+                'CONTENT_TYPE': ctype,
+                'CONTENT_LENGTH': self.headers.get_all('content-length')[0]
             }
 
             return FieldStorage(fp=self.rfile, environ=environ, headers=self.headers)
@@ -77,11 +82,11 @@ class SongSender(BaseHTTPRequestHandler):
         else:
             return {}
 
-    def handlegetsong(self, requestType):
+    def handlegetsong(self, request_type):
         logging.debug("[HTTPSSERVER] Handling getsong")
 
         # Get song id
-        if requestType == 'GET':
+        if request_type == 'GET':
             s_id = getSongIdFromUrl(self.path)
         else:  # POST
             s_id = getSongIdFromMap(self.getpostvariables())
@@ -121,7 +126,7 @@ class SongSender(BaseHTTPRequestHandler):
         if songid == 0:
             songid = smanager.getrandomsongid()
 
-        path = smanager._getsongpath(songid)
+        path = smanager.getsongpath(songid)
         if path is not None and isfile(path):
             # open file
             try:

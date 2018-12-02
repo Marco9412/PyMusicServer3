@@ -11,9 +11,9 @@ from settings.settingsprovider import SettingsProvider
 class SecureThreadedXMLRPCHTTPServer(ThreadingMixIn, HTTPServer, xmlrpc_server.SimpleXMLRPCServer):
     def __init__(self, handler, certFile=None, port=None):
         if not certFile:
-            certFile = SettingsProvider.get_instance().readsetting('httpscertpath')
+            certFile = SettingsProvider.get_instance().read_setting('httpscertpath')
         if not port:
-            port = int(SettingsProvider.get_instance().readsetting('listenporthttps'))
+            port = int(SettingsProvider.get_instance().read_setting('listenporthttps'))
         HTTPServer.__init__(self, ('0.0.0.0', port), handler, )
         SimpleXMLRPCServer.__init__(self, ('0.0.0.0', port), handler, allow_none=True)
         self.socket = ssl.wrap_socket(self.socket, server_side=True, certfile=certFile, keyfile=certFile,

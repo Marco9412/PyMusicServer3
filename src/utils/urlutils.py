@@ -4,7 +4,6 @@
 
 import urllib
 import re
-from cgi import FieldStorage
 
 
 def getUrlPath(url):

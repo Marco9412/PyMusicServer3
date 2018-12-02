@@ -3,6 +3,7 @@ import logging
 
 SETTINGS_FILE = './settings.cfg'
 
+
 def new_settings_file(path):
     global SETTINGS_FILE
     SETTINGS_FILE = path
@@ -22,17 +23,15 @@ class SettingsProvider(object):
         if SettingsProvider.instance:
             del SettingsProvider.instance
 
-
     # The MUST have parameters to run application
     parameters = [
         'dbfile',
         'songbasepath',
-        'httpscertpath',
         'listenporthttp',
-        'listenporthttps'
+        'redirectbasepath'
     ]
 
-    def __init__(self, settingsfilepath = None):
+    def __init__(self, settingsfilepath=None):
         global SETTINGS_FILE
         if not settingsfilepath:
             settingsfilepath = SETTINGS_FILE
@@ -42,14 +41,13 @@ class SettingsProvider(object):
         self.localsettings = {
             'dbfilename': 'songdb.sqlite',
             'dbfilepath': '/tmp',
-            'httpscertpath': './sockcert.pem',
             'listenporthttp': '9998',
-            'listenporthttps': '9999'
+            'redirectbasepath': 'panaapps/pymusicserver3/'
         }
-        self.__loadsettings(settingsfilepath)
-        self.__checkSettings()
+        self._load_settings(settingsfilepath)
+        self._check_settings()
 
-    def __loadsettings(self, settingsfile):
+    def _load_settings(self, settingsfile):
         logging.debug('[SETTINGS] Loading settings from %s' % settingsfile)
         cp = configparser.RawConfigParser()
         if cp.read(settingsfile) != [settingsfile]:
@@ -62,14 +60,20 @@ class SettingsProvider(object):
         # Add custom param
         self.localsettings['dbfile'] = self.localsettings.get('dbfilepath') + '/' + self.localsettings.get('dbfilename')
 
-    def __checkSettings(self):
+        # Fix starting / in basepath redirect! (nginx)
+        if 'redirectbasepath' in self.localsettings and \
+                self.localsettings['redirectbasepath'] != '' and \
+                self.localsettings['redirectbasepath'][0] == '/':
+            self.localsettings['redirectbasepath'] = self.localsettings['redirectbasepath'][1:]
+
+    def _check_settings(self):
         for key in SettingsProvider.parameters:
             if key not in list(self.localsettings.keys()):
                 logging.critical('Missing parameters! Minimum set is:' + str(SettingsProvider.parameters))
                 exit(1)
 
-    def readsetting(self, key):
+    def read_setting(self, key):
         return self.localsettings.get(key)
 
-    def getsettingskeys(self):
+    def get_settings_keys(self):
         return list(self.localsettings.keys())

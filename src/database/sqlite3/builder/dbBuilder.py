@@ -15,12 +15,6 @@ MUTEX = threading.Semaphore()  # Mutex
 
 DB_CREATE_SCRIPT = \
     """
-    CREATE TABLE User (
-    name TEXT PRIMARY KEY,
-    pass TEXT NOT NULL,
-    role INTEGER NOT NULL DEFAULT 1 CHECK (role > 0)
-);
-
 --- Folder (name, rowid of the parent folder, isroot)
 --- Rootfolder ('/.../.../path', 0, 1)
 --- NonRootFolder  ('Marzo', 23, 0)
@@ -49,13 +43,6 @@ CREATE TABLE YtVids (
     videoId TEXT PRIMARY KEY,
     songId INTEGER NOT NULL REFERENCES Song(rowid)
 );
-
---  Dummy, dummy -> min level
---	Marco, ciao -> max level
-INSERT INTO User
-VALUES  ('dummy', '275876e34cf609db118f3d84b799a790', 1),
-		('marco', '6e6bc4e49dd477ebc98ef4046c067b5f', 5);
-
     """
 
 
@@ -243,9 +230,9 @@ def deleteFolder(conn, folderid):
 # ------------------------------------------------------------------------------
 def buildDb(basePath=None, dbFile=None, async=False):
     if not basePath:
-        basePath = str(SettingsProvider.get_instance().readsetting('songbasepath'))
+        basePath = str(SettingsProvider.get_instance().read_setting('songbasepath'))
     if not dbFile:
-        dbFile = SettingsProvider.get_instance().readsetting('dbfile')
+        dbFile = SettingsProvider.get_instance().read_setting('dbfile')
 
     MUTEX.acquire()
 

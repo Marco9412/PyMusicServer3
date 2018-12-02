@@ -1,5 +1,5 @@
 #
-#	Sqlite3 database manager
+# Sqlite3 database manager
 #
 
 import sqlite3
@@ -29,16 +29,16 @@ class DbManager(object):
         if DbManager.instance:
             del DbManager.instance
 
-    def __init__(self, dbFile = None, build = True):
+    def __init__(self, dbFile=None, build=True):
         if not dbFile:
-            self.__dbFile = SettingsProvider.get_instance().readsetting('dbfile')
+            self.__dbFile = SettingsProvider.get_instance().read_setting('dbfile')
         else:
             self.__dbFile = dbFile
-        logging.debug('[DBUTILS] Opening db %s' % (self.__dbFile))
+        logging.debug('[DBUTILS] Opening db %s' % self.__dbFile)
         if build:
-            buildDb(async=False) # Run in current thread
+            buildDb(async=False)  # Run in current thread
 
-    def updateDb(self, async = True):
+    def updateDb(self, async=True):
         buildDb(async=async)
 
     def listsongs(self):
@@ -159,7 +159,6 @@ class DbManager(object):
         :return: the Playlist object associated with the name
         """
         conn = sqlite3.connect(self.__dbFile)
-        playlist = None
 
         cursor = conn.cursor()
         songs = []
@@ -217,25 +216,6 @@ class DbManager(object):
         conn.close()
 
         return sid
-
-    def getusers(self):
-        users = {}
-        sq = sqlite3.connect(self.__dbFile)
-        c = sq.cursor()
-        for row in c.execute('SELECT rowid, name, pass, role FROM User'):
-            logging.debug("[DBUTILS] Found user " + row[1])
-            users[row[1]] = (row[2], row[3])
-        sq.close()
-
-        return users
-
-    def addnewuser(self, username, password, role):
-        logging.debug("[DBUTILS] Adding new user (%s,*****, %d)" % (username, role))
-        sq = sqlite3.connect(self.__dbFile)
-        c = sq.cursor()
-        c.execute('INSERT INTO User VALUES(?,?,?)', [username, md5(password.encode()).hexdigest(), role])
-        sq.commit()
-        sq.close()
 
     def __addnewfolderfrompath(self, path):
         path = removeLastSlash(removeDoubleSlash(path))

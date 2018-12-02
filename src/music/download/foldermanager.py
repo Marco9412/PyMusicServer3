@@ -22,7 +22,7 @@ class FolderManager(object):
     ]
 
     def __init__(self):
-        self._path = SettingsProvider.get_instance().readsetting('songbasepath') + '/' + str(datetime.date.today().year) + '/' + FolderManager.monthsstr[datetime.date.today().month]
+        self._path = SettingsProvider.get_instance().read_setting('songbasepath') + '/' + str(datetime.date.today().year) + '/' + FolderManager.monthsstr[datetime.date.today().month]
 
     def getFolderPath(self):
         self._maybeCreateFolder()

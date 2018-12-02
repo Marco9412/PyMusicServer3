@@ -1,14 +1,13 @@
 #
 # WebResponseBuilder class
 #
-#	this class handles http connections, building the
-#	correct HTML webpage
+# This class handles http connections, building the
+# correct HTML webpage
 #
 
-from frontend.webpagebuilder.htmlutils import writehtmlheader, writehtmlhead, writehtmlend, \
-    writetableheader, writetablerow, writetableend, writesearchform, writedownloadform, writehostnamefolderfunction,\
-    writehostnameplaylistfunction, writeUploadForm, writePublicUrlFunction
+from frontend.webpagebuilder.htmlutils import *
 from music.manager import PyMusicManager
+from settings.settingsprovider import SettingsProvider
 
 
 class WebResponseBuilder(object):
@@ -46,7 +45,8 @@ class WebResponseBuilder(object):
 
     def _hasKey(self, key):
         if isinstance(self._reqvars, dict):
-            if isinstance(key, str) and self._reqType == 'POST': key = key.encode()
+            if isinstance(key, str) and self._reqType == 'POST':
+                key = key.encode()
             return key in self._reqvars
         else:
             # FieldStorage
@@ -125,7 +125,7 @@ class WebResponseBuilder(object):
                 res += writetableheader(['Name'])
                 # Switch to parent
                 if folder.parentId != 0:
-                    res += (writetablerow(['<a href=\"?type=folder&id=%d\">..</a>' % (folder.parentId)]))
+                    res += (writetablerow(['<a href=\"?type=folder&id=%d\">..</a>' % folder.parentId]))
 
                 if f != []:
                     for fid in f:
@@ -133,12 +133,13 @@ class WebResponseBuilder(object):
                     res += (writetableend())
 
             # Write songs
-            if s != []:
+            if s:
                 # res += u'<h3>Songs</h3>'
                 res += writetableheader(['Title', 'Artist', 'Name'])
                 for song in s:
                     res += (writetablerow(
-                        [song.title, song.artist, '<a href=\"/getsong?id=%d\">%s</a>' % (song.oid, song.name)]))
+                        [song.title, song.artist, '<a href=\"/%sgetsong?id=%d\">%s</a>' %
+                         (SettingsProvider.get_instance().read_setting('redirectbasepath'), song.oid, song.name)]))
                 res += (writetableend())
 
             if not public:
@@ -159,7 +160,9 @@ class WebResponseBuilder(object):
         res = writehtmlheader() + writehtmlhead('Song View') + '<h2>Songs</h2>' + writetableheader(
             ['Title', 'Artist', 'Name'])
         for sid in songs:
-            res += (writetablerow([sid.title, sid.artist, '<a href=\"/getsong?id=%d\">%s</a>' % (sid.oid, sid.name)]))
+            res += (writetablerow([sid.title, sid.artist, '<a href=\"/%sgetsong?id=%d\">%s</a>' %
+                                   (SettingsProvider.get_instance().read_setting('redirectbasepath'),
+                                    sid.oid, sid.name)]))
         res += (writetableend())
 
         res += writehtmlend()
@@ -188,7 +191,8 @@ class WebResponseBuilder(object):
 
         res = writehtmlheader() + writehtmlhead('Random song')
         res += '<h3>Random song</h3><p>Title ' + songitem.title + '</p><p>Artist: ' + songitem.artist + '</p>'
-        res += '<embed src="/getsong?id=' + str(sid) + '"/>'
+        res += '<embed src="/' + SettingsProvider.get_instance().read_setting('redirectbasepath') + 'getsong?id=' + \
+               str(sid) + '"/>'
 
         res += writehtmlend()
         self._response = res
@@ -215,7 +219,9 @@ class WebResponseBuilder(object):
             for sid in playlist.songs:
                 song = manager.getsong(sid)
                 if song is not None:
-                    res += (writetablerow(['<a href=\"/getsong?id=%d\">%s</a>' % (song.oid, song.name)]))
+                    res += (writetablerow(['<a href=\"/%sgetsong?id=%d\">%s</a>' %
+                                           (SettingsProvider.get_instance().read_setting('redirectbasepath'),
+                                            song.oid, song.name)]))
         res += (writetableend())
 
         res += '<a href="javascript:void(0)" onClick="getPl();">Get m3u file</a>'
@@ -241,7 +247,8 @@ class WebResponseBuilder(object):
         res += writetableheader(['Title', 'Artist', 'Name'])
         ss = manager.searchsong(data)
         for s in ss:
-            res += writetablerow([s.title, s.artist, '<a href=\"/getsong?id=%d\">%s</a>' % (s.oid, s.name)])
+            res += writetablerow([s.title, s.artist, '<a href=\"/%sgetsong?id=%d\">%s</a>' %
+                                  (SettingsProvider.get_instance().read_setting('redirectbasepath'), s.oid, s.name)])
 
         res += writetableheader(['Name'])
         ss = manager.searchfolder(data)
@@ -257,7 +264,6 @@ class WebResponseBuilder(object):
 
         self._response = res
 
-
     def _handleDownloadView(self, url):
         if self._role < 5:
             self._response = "Forbidden!"
@@ -271,7 +277,7 @@ class WebResponseBuilder(object):
             res += '<p>Song is downloading...</p>'
         else:
             res += '<p>Cannot download song! Server error</p>'
-        res += '<br><a href=\"/songs/\">Back</a>'
+        res += '<br><a href=\"/%ssongs/\">Back</a>' % SettingsProvider.get_instance().read_setting('redirectbasepath')
 
         res += writehtmlend()
 
@@ -288,7 +294,7 @@ class WebResponseBuilder(object):
 
         res = writehtmlheader() + writehtmlhead('Update') + '<h3>Updating...</h3>'
 
-        res += '<br><a href=\"/songs/\">Back</a>'
+        res += '<br><a href=\"/%ssongs/\">Back</a>' % SettingsProvider.get_instance().read_setting('redirectbasepath')
 
         res += writehtmlend()
 
@@ -310,7 +316,7 @@ class WebResponseBuilder(object):
             res += '<h3>Upload unsuccesful!</h3>'
             res += '<p>Cannot upload %s!</p>' % name
 
-        res += '<br><a href=\"/songs/\">Back</a>'
+        res += '<br><a href=\"/%ssongs/\">Back</a>' % SettingsProvider.get_instance().read_setting('redirectbasepath')
         res += writehtmlend()
 
         self._response = res
