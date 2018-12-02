@@ -41,7 +41,7 @@ class SettingsProvider(object):
         self.localsettings = {
             'dbfilename': 'songdb.sqlite',
             'dbfilepath': '/tmp',
-            'listenporthttp': '9998',
+            'listenporthttp': '9999',
             'redirectbasepath': 'panaapps/pymusicserver3/'
         }
         self._load_settings(settingsfilepath)
