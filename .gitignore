@@ -2,3 +2,9 @@ __pycache__/
 .idea/
 out/
 resources/sockcert_my.pem
+resources/settings_net.cfg
+*.sqlite
+pymusicserver3.log
+pymusicserver3.log.old
+systemd/PyMusicServer3.service
+nginx/pymusicserver3_noauth.conf
