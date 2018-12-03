@@ -33,8 +33,6 @@ class HttpHandler(SongSender, SimpleXMLRPCRequestHandler):
 
     def do_GET(self):
         urlPath = getUrlPath(self.path)
-        if urlPath in HttpHandler.rpc_paths:
-            return SimpleXMLRPCRequestHandler.do_GET(self)
         if urlPath[:8] == '/getsong':
             SongSender.handlegetsong(self, 'GET')
         elif urlPath[:6] == "/songs":
@@ -49,7 +47,7 @@ class HttpHandler(SongSender, SimpleXMLRPCRequestHandler):
     def do_POST(self):
         urlPath = getUrlPath(self.path)
         if urlPath in HttpHandler.rpc_paths:
-            return SimpleXMLRPCRequestHandler.do_GET(self)
+            return SimpleXMLRPCRequestHandler.do_POST(self)
         if urlPath[:8] == '/getsong':
             SongSender.handlegetsong(self, 'POST')
         elif urlPath[:6] == "/songs":
