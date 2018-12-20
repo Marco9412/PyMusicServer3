@@ -17,16 +17,16 @@ from utils.urlutils import getSongIdFromMap, getSongIdFromUrl, getQueryStringMap
 
 class SongSender(BaseHTTPRequestHandler):
 
-    def handleerror(self):
+    def handle_error(self):
         logging.debug("[HTTPSSERVER] Wrong url")
         self.send_response(404)
         self.end_headers()
 
     def handle_get_playlist(self, request_type):
-        params = getQueryStringMap(self.path) if request_type == 'GET' else self.getpostvariables()
+        params = getQueryStringMap(self.path) if request_type == 'GET' else self.get_post_variables()
 
         if params is None:
-            self.handleerror()
+            self.handle_error()
             return
 
         ip = params.get('ip')
@@ -48,16 +48,16 @@ class SongSender(BaseHTTPRequestHandler):
             else:
                 rec = False
 
-            self._sendm3u(PyMusicManager.get_instance().getm3ufromfolder(fol_id, ip, rec), 'plf_%d.m3u' % fol_id)
+            self._send_m3u(PyMusicManager.get_instance().getm3ufromfolder(fol_id, ip, rec), 'plf_%d.m3u' % fol_id)
         elif req_type == 'playlist':
             name = params.get('name')
             if name:
                 name = name[0]
-            self._sendm3u(PyMusicManager.get_instance().getm3ufromplaylist(name, ip), 'plp_%s.m3u' % name)
+            self._send_m3u(PyMusicManager.get_instance().getm3ufromplaylist(name, ip), 'plp_%s.m3u' % name)
         else:
-            self.handleerror()
+            self.handle_error()
 
-    def getpostvariables(self):
+    def get_post_variables(self):
         ctype, pdict = parse_header(self.headers.get_all('content-type')[0])
         if ctype == 'multipart/form-data':
 
@@ -82,18 +82,18 @@ class SongSender(BaseHTTPRequestHandler):
         else:
             return {}
 
-    def handlegetsong(self, request_type):
+    def handle_get_song(self, request_type):
         logging.debug("[HTTPSSERVER] Handling getsong")
 
         # Get song id
         if request_type == 'GET':
             s_id = getSongIdFromUrl(self.path)
         else:  # POST
-            s_id = getSongIdFromMap(self.getpostvariables())
+            s_id = getSongIdFromMap(self.get_post_variables())
 
-        self._sendsong(s_id)
+        self._send_song(s_id)
 
-    def handlePublicFolderView(self, publicurl):
+    def handle_public_folder_view(self, publicurl):
         toSend = WebResponseBuilder(getUrlPath(self.path), 'GET', 1, {'puburl':publicurl, 'type':['publicFol']}).getResponse()
         if toSend:
             self.send_response(200)
@@ -104,7 +104,7 @@ class SongSender(BaseHTTPRequestHandler):
         else:
             self.send_error(500)
 
-    def _getsongbytesbound(self, size):
+    def _get_song_bytes_bound(self, size):
         start_range = 0
         end_range = size
         if "Range" in self.headers:
@@ -121,7 +121,7 @@ class SongSender(BaseHTTPRequestHandler):
                     start_range = size - ei
         return start_range, end_range
 
-    def _sendsong(self, songid):
+    def _send_song(self, songid):
         smanager = PyMusicManager.get_instance()
         if songid == 0:
             songid = smanager.getrandomsongid()
@@ -143,7 +143,7 @@ class SongSender(BaseHTTPRequestHandler):
                     self.send_header('Accept-Ranges', 'bytes')
 
                     if "Range" in self.headers:
-                        d = self._getsongbytesbound(size)
+                        d = self._get_song_bytes_bound(size)
                         # logging.debug("[HTTPSERVER] Range headers: %s, start: %d, end: %d" %
                         # (self.headers['Range'], d[0], d[1]))
                         start_range = d[0]
@@ -165,7 +165,7 @@ class SongSender(BaseHTTPRequestHandler):
         else:
             self.send_error(500)
 
-    def _sendm3u(self, m3utext, name):
+    def _send_m3u(self, m3utext, name):
         self.send_response(200)
         self.send_header('Content-type', 'audio/mpegurl')
         self.send_header('Content-length', len(m3utext))

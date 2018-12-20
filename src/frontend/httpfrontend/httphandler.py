@@ -15,7 +15,7 @@ class HttpHandler(SongSender, SimpleXMLRPCRequestHandler):
 
     def __handleweb(self, requestType, userrole):
         logging.debug("[HTTPSERVER] Handling web request")
-        reqvars = SongSender.getpostvariables(self) if requestType == 'POST' else getQueryStringMap(self.path)
+        reqvars = SongSender.get_post_variables(self) if requestType == 'POST' else getQueryStringMap(self.path)
 
         toSend = WebResponseBuilder(getUrlPath(self.path), requestType, userrole, reqvars).getResponse()
         if toSend:
@@ -34,30 +34,30 @@ class HttpHandler(SongSender, SimpleXMLRPCRequestHandler):
     def do_GET(self):
         urlPath = getUrlPath(self.path)
         if urlPath[:8] == '/getsong':
-            SongSender.handlegetsong(self, 'GET')
+            SongSender.handle_get_song(self, 'GET')
         elif urlPath[:6] == "/songs":
             self.__handleweb('GET', 5)  # TODO role 5 ? -> authentication done by nginx!
         elif urlPath[:4] == "/m3u":
             SongSender.handle_get_playlist(self, 'GET')
         elif urlPath[:8] == "/public/":
-            SongSender.handlePublicFolderView(self, urlPath[8:])
+            SongSender.handle_public_folder_view(self, urlPath[8:])
         else:
-            SongSender.handleerror(self)
+            SongSender.handle_error(self)
 
     def do_POST(self):
         urlPath = getUrlPath(self.path)
         if urlPath in HttpHandler.rpc_paths:
             return SimpleXMLRPCRequestHandler.do_POST(self)
         if urlPath[:8] == '/getsong':
-            SongSender.handlegetsong(self, 'POST')
+            SongSender.handle_get_song(self, 'POST')
         elif urlPath[:6] == "/songs":
             self.__handleweb('GET', 5)  # TODO role 5 ? -> authentication done by nginx!
         elif urlPath[:4] == "/m3u":
             SongSender.handle_get_playlist(self, 'POST')
         elif urlPath[:8] == "/public/":
-            SongSender.handlePublicFolderView(self, urlPath[8:])
+            SongSender.handle_public_folder_view(self, urlPath[8:])
         else:
-            SongSender.handleerror(self)
+            SongSender.handle_error(self)
 
 
 def create_http_server():

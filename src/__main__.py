@@ -14,7 +14,6 @@ from music.manager import PyMusicManager
 from settings.settingsprovider import SettingsProvider
 from utils.threadingutils import runinanotherthread
 from frontend.httpfrontend.httphandler import create_http_server
-# from frontend.httpsfrontend.httpshandler import createHTTPSServer
 from parameters.parameterparser import parse_arguments
 from music.download.youtubedlupdater import YoutubeDlUpdater
 
@@ -43,14 +42,9 @@ def main():
     logging.info('[MAIN] Creating HTTP frontend')
     httpfrontend = create_http_server()
 
-    # logging.info('[MAIN] Creating HTTPS frontend')
-    # httpsfrontend = createHTTPSServer()
-
-    logging.info('[MAIN] Waiting for clients on port %s and %s...' % (
-        SettingsProvider.get_instance().read_setting('listenporthttp'),
-        SettingsProvider.get_instance().read_setting('listenporthttps')))
+    logging.info('[MAIN] Waiting for clients on port %s ...' %
+                 SettingsProvider.get_instance().read_setting('listenporthttp'))
     threadhttp = runinanotherthread(httpfrontend.serve_forever)
-    # threadhttps = runinanotherthread(httpsfrontend.serve_forever)
 
     try:
         while True:
@@ -60,13 +54,8 @@ def main():
     finally:
         logging.info("[MAIN] Closing server")
         httpfrontend.shutdown()
-        # httpsfrontend.shutdown()
-
         threadhttp.join(2)
-        # threadhttps.join(2)
-
         del httpfrontend
-        # del httpsfrontend
 
         logging.info('[MAIN] Closing youtube-dl updater')
         ydlupdater.stop()
