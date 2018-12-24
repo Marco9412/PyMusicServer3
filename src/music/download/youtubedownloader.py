@@ -18,12 +18,14 @@ class PyYoutubeDownloader(object):
         logging.debug('[DOWNLOADER] Created object with %s' % url)
         self.url = url
         self._videoId = getYtVideoId(url)
-        self.__canrun = checkHostname(url, 'www.youtube.com') or checkHostname(url, 'youtu.be')
+        # done in getYtVideoId(url)
+        # self.__canrun = checkHostname(url, 'www.youtube.com') or checkHostname(url, 'youtu.be')
 
         if not self._videoId:
             logging.debug('[DOWNLOADER] Cannot extract ID from this URL!')
+            self.__canrun = false
         else:
-            self.__canrun = self.__canrun and DataManager.get_instance().canDownload(self._videoId)
+            self.__canrun = DataManager.get_instance().canDownload(self._videoId)
 
     def download(self):
         if self.__canrun:
