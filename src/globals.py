@@ -1,3 +1,3 @@
 
-REVISION = 'r0.1.20 beta nginx'
-DATE = '2018/12/20'
+REVISION = 'r0.1.21 beta nginx'
+DATE = '2019/01/29'

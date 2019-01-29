@@ -122,7 +122,7 @@ class PyMusicManager(object):
             if song:
                 res += '#EXTINF:%d, %s - %s\n' % (song.oid, song.artist, song.title)
             res += 'http://%s:%s/%sgetsong?id=%d\n' % (myremoteip,
-                                                       SettingsProvider.get_instance().read_setting('listenporthttp'),
+                                                       SettingsProvider.get_instance().read_setting('redirectport'),
                                                        SettingsProvider.get_instance().read_setting('redirectbasepath'),
                                                        songid)
         return res
@@ -133,7 +133,7 @@ class PyMusicManager(object):
         for song in songs:
             res += '#EXTINF:%d, %s - %s\n' % (song.oid, song.artist, song.title)
             res += 'http://%s:%s/%sgetsong?id=%d\n' % (myremoteip,
-                                                       SettingsProvider.get_instance().read_setting('listenporthttp'),
+                                                       SettingsProvider.get_instance().read_setting('redirectport'),
                                                        SettingsProvider.get_instance().read_setting('redirectbasepath'),
                                                        song.oid)
 

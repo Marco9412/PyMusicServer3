@@ -28,6 +28,7 @@ class SettingsProvider(object):
         'dbfile',
         'songbasepath',
         'listenporthttp',
+        'redirectport',
         'redirectbasepath'
     ]
 
@@ -42,6 +43,7 @@ class SettingsProvider(object):
             'dbfilename': 'songdb.sqlite',
             'dbfilepath': '/tmp',
             'listenporthttp': '9999',
+            'redirectport' : '80',
             'redirectbasepath': 'panaapps/pymusicserver3/'
         }
         self._load_settings(settingsfilepath)
