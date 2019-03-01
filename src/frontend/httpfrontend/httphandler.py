@@ -61,6 +61,6 @@ class HttpHandler(SongSender, SimpleXMLRPCRequestHandler):
 
 
 def create_http_server():
-    server = ThreadedXMLRPCHTTPServer(HttpHandler, listen_localhost=True)
+    server = ThreadedXMLRPCHTTPServer(HttpHandler, listen_localhost=False)  # TODO check this
     server.register_instance(PyMusicManager.get_instance())
     return server

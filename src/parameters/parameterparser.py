@@ -15,6 +15,7 @@ def parse_arguments():
     # parser.add_argument('-r', '--redirect', type=str, metavar='F', help='redirect output to F')
     parser.add_argument('-l', '--log_level', type=str, default='info', choices=['info', 'debug', 'warning'],
                         help='The level of logging required, default info')
+    parser.add_argument('-f', '--logstdout', action='store_true', help='Log to stdout')
     parser.add_argument('-v', '--version', action='store_true', help='show version')
 
     params = parser.parse_args()
@@ -23,7 +24,7 @@ def parse_arguments():
         print('Version: {}, Build date: {}'.format(globals.REVISION, globals.DATE))
         exit(0)
 
-    init_logging(params.log_level)
+    init_logging(params.log_level, True if params.logstdout else False)
 
     if params.settingsfile:
         new_settings_file(params.settingsfile)
