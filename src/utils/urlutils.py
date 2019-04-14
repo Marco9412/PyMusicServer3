@@ -1,5 +1,5 @@
 #
-#	Url utils
+# Url utils
 #
 
 import urllib
@@ -39,9 +39,11 @@ def removeLastSlash(str):
 def getYtVideoId(url):
     u = urllib.parse.urlparse(url)
     h = u.netloc
-    if h == 'youtu.be' or h == 'www.youtube.com' or h == 'music.youtube.com':
+    if (h == 'www.youtube.com' or h == 'music.youtube.com') and u.path == '/watch':
         qs = urllib.parse.parse_qs(u.query)
         return qs.get('v')[0] if 'v' in qs else None
+    if h == 'youtu.be':
+        return u.path[1:]
     return None
 
 

@@ -23,7 +23,7 @@ class PyYoutubeDownloader(object):
 
         if not self._videoId:
             logging.debug('[DOWNLOADER] Cannot extract ID from this URL!')
-            self.__canrun = false
+            self.__canrun = False
         else:
             self.__canrun = DataManager.get_instance().canDownload(self._videoId)
 
